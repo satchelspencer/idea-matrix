@@ -12,6 +12,8 @@ const reducers = {
 		switch(action.type){
 			case 'SET_CATS':
 				return _.uniq([...action.categories])
+			case 'SHUFFLE_CATS':
+				return _.shuffle(state);
 			default:
 				return state;
 		}
@@ -44,6 +46,16 @@ const reducers = {
 				return {open : true, cell : _.sortBy(action.cell)};
 			case 'DONE_EDITING':
 				return {...state, open : false};
+			default:
+				return state;
+		}
+	},
+	display(state={
+		order : 'name'
+	}, action){
+		switch(action.type){
+			case 'SET_ORDER':
+				return {...state, order : action.order};
 			default:
 				return state;
 		}

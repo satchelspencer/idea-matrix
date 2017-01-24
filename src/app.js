@@ -23,6 +23,16 @@ const styles = StyleSheet.create({
 
 const App = () => (
 	<div className={css(styles.container)}>
+		<div 
+			style={{
+				position : 'absolute',
+				top : 0,
+				left : 0,
+				width : 100,
+				height : 50
+			}}
+			onClick={() => {}}
+		/>
 		<Rulers/>
 		<Matrix/>
 		<Editor/>

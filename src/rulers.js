@@ -3,6 +3,7 @@ import { StyleSheet, css } from 'aphrodite';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import cluster from './lib/cluster';
+import {Motion, spring} from 'react-motion';
 
 const styles = StyleSheet.create({
 	rulers : {
@@ -33,6 +34,7 @@ const styles = StyleSheet.create({
 		transformOrigin: '0 0'
 	},
 	catbox : {
+		position : 'absolute',
 		width : 100,
 		height : 100,
 		display : 'flex',
@@ -60,16 +62,19 @@ const Ruler = connect(state => ({
 		<div 
 			className={css(axis=='x' && styles.innerX)}
 			style={{
-				[axis=='x'?'marginLeft':'marginTop'] : Math.min(offset[axis=='x'?0:1], 0)
+				position : 'absolute',
+				[axis=='x'?'left':'top'] : Math.min(offset[axis=='x'?0:1], 0)
 			}}
 		>
 			{categories.map((catname, i) => (
-				<div 
-					key={catname+i} 
-					className={css(styles.catbox)}
-				>
-					{catname}
-				</div>
+				<Motion key={catname+axis} style={{top: spring(i*100)}}>{value => 
+					<div 
+						className={css(styles.catbox)}
+						style={value}
+					>
+						{catname}
+					</div>
+				}</Motion>
 			))}
 		</div>
 	</div>

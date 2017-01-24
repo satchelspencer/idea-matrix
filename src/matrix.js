@@ -6,6 +6,7 @@ import Draggable from 'react-draggable';
 import Measure from 'react-measure';
 import ui from 'redux-ui';
 import cluster from './lib/cluster';
+import {Motion, spring} from 'react-motion';
 
 const styles = StyleSheet.create({
 	matrix : {
@@ -24,6 +25,7 @@ const styles = StyleSheet.create({
 		display : 'flex'
 	},
 	cell : {
+		position : 'absolute',
 		width : 100,
 		height : 100,
 		borderBottom : '1px solid #d8d8d8',
@@ -64,30 +66,43 @@ const Matrix = ui({
 				]
 			})}
 		>
-			<div className={css(styles.innerMatrix)}>
+			<div 
+				className={css(styles.innerMatrix)}
+				style={{width : categories.length*100, height : categories.length*100}}
+			>
 				{categories.map((catname, i) => (
-					<div key={catname+i} className={css(styles.row)}>
-						{categories.map((catnameB, j) => {
-							const ids = _.sortBy([catname,catnameB]);
-							const value = (ideas[ids[0]]||{})[ids[1]]
-							return (
+					<div key={catname+'m'}>
+					{categories.map((catnameB, j) => {
+						const ids = _.sortBy([catname,catnameB]);
+						const val = (ideas[ids[0]]||{})[ids[1]]
+						return (
+							<Motion key={catname+catnameB} 
+								style={{
+									top: spring(i*100),
+									left : spring(j*100)
+								}}
+							>{value => 
 								<div
-									key={catname+catnameB+j+i} 
 									className={css(styles.cell)}
 									onClick={() => {
+										// !ui.noclick && dispatch({
+										// 	type : 'EDIT_CELL',
+										// 	cell : [catname, catnameB]
+										// })
 										!ui.noclick && dispatch({
-											type : 'EDIT_CELL',
-											cell : [catname, catnameB]
+											type : 'SET_IDEA',
+											cell : [catname, catnameB],
+											value : 'ay'
 										})
 									}}
 									style={{
-										background : value?`rgba(134, 245, 195, ${Math.min(value.length/15, 1)})`:'white'
+										...value,
+										background : val?`rgb(134, 245, 195)`:'white'
 									}}
-								>
-									
-								</div>
-							)
-						})}
+								/>
+							}</Motion>							
+						)
+					})}
 					</div>
 				))}
 			</div>
