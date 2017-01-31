@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import ui from 'redux-ui';
 import cluster from './lib/cluster'
+import { ActionCreators } from 'redux-undo';
 
 const styles = StyleSheet.create({
 	wrapper : {
@@ -29,8 +30,8 @@ const styles = StyleSheet.create({
 	}
 })
 
-const Icon = ({name, onClick}) => (
-	<span className={'fa fa-'+name+' '+css(styles.icon)} onClick={onClick}/>
+const Icon = ({name, onClick, ...props}) => (
+	<span {...props} className={'fa fa-'+name+' '+css(styles.icon)} onClick={onClick}/>
 )
 
 const Menu = ui({state : {
@@ -39,8 +40,10 @@ const Menu = ui({state : {
 	ui, updateUI, resetUI,
 	dispatch,
 	categories,
+	categoriesPast,
 	ideas,
 	menu,
+	removing,
 	params
 }) => (
 	<div className={css(styles.wrapper)} style={{
@@ -53,10 +56,13 @@ const Menu = ui({state : {
 				addTopic : true
 			}
 		})}/>
-		<Icon name='trash'/>
-		<Icon name='search' onClick={() => {
+		<Icon style={{
+			background : removing && '#ffb4b4'
+		}} name='trash' onClick={() => dispatch({
+			type : 'TOGGLE_REMOVING'
+		})}/>
+		<Icon name='th-large' onClick={() => {
 			const {rows, clusters} = cluster(ideas, categories);
-			console.log(clusters);
 			dispatch({
 				type : 'SET_CLUSTERS',
 				clusters
@@ -74,12 +80,17 @@ const Menu = ui({state : {
 			type : 'SET_CATS',
 			categories : _.shuffle(categories)
 		})}/>
+		<Icon style={{
+			opacity : categoriesPast.length < 2 && '0.5'
+		}} name='undo' onClick={() => categoriesPast.length > 1 && dispatch(ActionCreators.undo())}/>
 	</div>
 ))
 export default connect(
 	state => ({
-		categories : state.categories,
+		categories : state.categories.present,
+		categoriesPast : state.categories.past,
 		ideas : state.ideas,
-		menu : state.menu
+		menu : state.menu,
+		removing : state.removing
 	})
 )(Menu);

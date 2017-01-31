@@ -4,11 +4,12 @@ import _ from 'lodash';
 import fetch from 'isomorphic-fetch';
 import uniqid from '../lib/uniqid'
 import cluster from '../lib/cluster';
+import undoable from 'redux-undo';
 
 
 const reducers = {
 	ui : uiReducer,
-	categories(state=[],action){
+	categories : undoable((state=[],action) => {
 		switch(action.type){
 			case 'SET_CATS':
 				return _.uniq([...action.categories])
@@ -19,7 +20,7 @@ const reducers = {
 			default:
 				return state;
 		}
-	},
+	}),
 	clusters(state={},action){
 		if(action.type=='SET_CLUSTERS') return action.clusters;
 		else return state;
@@ -45,6 +46,10 @@ const reducers = {
 	},
 	menu(state=false,action){
 		if(action.type=='TOGGLE_MENU') return !state;
+		else return state;
+	},
+	removing(state=false,action){
+		if(action.type=='TOGGLE_REMOVING') return !state;
 		else return state;
 	},
 	popup(state={
@@ -95,6 +100,7 @@ let store = createStore(combineReducers(reducers), {}, compose(
 let currentIdeas = {};
 store.subscribe(() => {
 	const ideas = _.pick(store.getState(), 'ideas', 'categories', 'clusters');
+	ideas.categories = ideas.categories && ideas.categories.present
 	if(!_.isEqual(ideas, currentIdeas)){
 		currentIdeas = JSON.parse(JSON.stringify(ideas));
 		fetch('/api/state/'+window.location.hash.substr(1), {

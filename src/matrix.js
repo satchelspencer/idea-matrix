@@ -87,19 +87,19 @@ const Matrix = ui({
 								<div
 									className={css(styles.cell)}
 									onClick={() => {
-										!ui.noclick && dispatch({
-											type : 'OPEN_POPUP',
-											params : {
-												editor : true,
-												head : catname+' & '+catnameB,
-												cell : [catname, catnameB]
-											}
-										})
 										// !ui.noclick && dispatch({
-										// 	type : 'SET_IDEA',
-										// 	cell : [catname, catnameB],
-										// 	value : 'ay'
+										// 	type : 'OPEN_POPUP',
+										// 	params : {
+										// 		editor : true,
+										// 		head : catname+' & '+catnameB,
+										// 		cell : [catname, catnameB]
+										// 	}
 										// })
+										!ui.noclick && dispatch({
+											type : 'SET_IDEA',
+											cell : [catname, catnameB],
+											value : 'ay'
+										})
 									}}
 									style={{
 										...value,
@@ -118,7 +118,7 @@ const Matrix = ui({
 ))
 export default connect(
 	state => ({
-		categories : state.categories,
+		categories : state.categories.present,
 		ideas : state.ideas,
 		clusters : state.clusters
 	})

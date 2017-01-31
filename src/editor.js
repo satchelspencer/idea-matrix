@@ -58,7 +58,7 @@ const Editor = ui({state : {
 ))
 export default connect(
 	state => ({
-		categories : state.categories,
+		categories : state.categories.present,
 		ideas : state.ideas
 	})
 )(Editor);

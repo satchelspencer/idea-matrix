@@ -33,10 +33,9 @@ export function oldCluster(ideas, categories){
 export default function(ideas, categories){
 	const l = categories.length;
 	const arr = _.fill(Array(l), 0).map(a => _.fill(Array(l), 0));
-
 	_.each(ideas, (val, key) => {
 		_.each(val, (v,keyb) => {
-			if(v){
+			if(v && _.includes(categories, key) && _.includes(categories, keyb)){
 				arr[categories.indexOf(key)][categories.indexOf(keyb)] = 1;
 				arr[categories.indexOf(keyb)][categories.indexOf(key)] = 1;
 			}
@@ -47,6 +46,12 @@ export default function(ideas, categories){
 	cIndicies.filter(c => c.length > 1).forEach((group,i) => {
 		group.forEach(j => clusters[categories[j]] = i)
 	})
-	const rows = _.uniq(_.flatten(_.sortBy(cIndicies, c=>c.length*-1))).map(i => categories[i]);
+	const rows = _.uniq(
+		_.flatten(
+			_.sortBy(cIndicies, c=>c.length*-1).map(
+				group => _.sortBy(group.map(i => categories[i]), cat => cat.toLowerCase())
+			)
+		)
+	)
 	return {rows, clusters};
 }

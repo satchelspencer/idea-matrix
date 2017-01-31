@@ -48,16 +48,28 @@ const styles = StyleSheet.create({
 		textAlign : 'center',
 		wordBreak : 'break-word',
 		hyphens : 'auto'
+	},
+	del : {
+		position : 'absolute',
+		fontSize: 100,
+    width: '100%',
+    height: '100%',
+    top: -14,
+    left: -2,
+    opacity: 0.5
 	}
 })
 
 const Ruler = connect(state => ({
-	categories : state.categories,
-	offset : state.offset
+	categories : state.categories.present,
+	offset : state.offset,
+	removing : state.removing
 }))(({
 	axis,
 	offset,
-	categories
+	removing,
+	categories,
+	dispatch
 }) =>(
 	<div className={css(styles.ruler, axis=='x'?styles.rulerX:styles.rulerY)}>
 		<div 
@@ -71,8 +83,19 @@ const Ruler = connect(state => ({
 				<Motion key={catname+axis} style={{top: spring(i*100, {stiffness : 200, damping : 40})}}>{value => 
 					<div 
 						className={css(styles.catbox)}
-						style={value}
+						style={{
+							...value,
+							background : removing && '#bc0000',
+							color : removing && 'white'
+						}}
 					>
+						{removing && <div 
+							className={css(styles.del)}
+							onClick={() => dispatch({
+								type : 'SET_CATS',
+								categories : _.without(categories, catname)
+							})}
+						>&times;</div>}
 						{catname}
 					</div>
 				}</Motion>
