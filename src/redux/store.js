@@ -14,9 +14,15 @@ const reducers = {
 				return _.uniq([...action.categories])
 			case 'SHUFFLE_CATS':
 				return _.shuffle(state);
+			case 'ADD_CAT':
+				return [action.cat, ...state]
 			default:
 				return state;
 		}
+	},
+	clusters(state={},action){
+		if(action.type=='SET_CLUSTERS') return action.clusters;
+		else return state;
 	},
 	ideas(state={}, action){
 		switch(action.type){
@@ -36,6 +42,26 @@ const reducers = {
 	offset(state=[0,0],action){
 		if(action.type == 'MATRIX_OFFSET') return action.offset;
 		else return state;
+	},
+	menu(state=false,action){
+		if(action.type=='TOGGLE_MENU') return !state;
+		else return state;
+	},
+	popup(state={
+		open : false,
+		params : {}
+	}, action){
+		switch(action.type){
+			case 'OPEN_POPUP':
+				return {...state, 
+					open : true,
+					params : action.params||{}
+				}
+			case 'CLOSE_POPUP':
+				return {...state, open : false}
+			default:
+				return state
+		}
 	},
 	editing(state={
 		open : false,
@@ -68,7 +94,7 @@ let store = createStore(combineReducers(reducers), {}, compose(
 
 let currentIdeas = {};
 store.subscribe(() => {
-	const ideas = _.pick(store.getState(), 'ideas', 'categories');
+	const ideas = _.pick(store.getState(), 'ideas', 'categories', 'clusters');
 	if(!_.isEqual(ideas, currentIdeas)){
 		currentIdeas = JSON.parse(JSON.stringify(ideas));
 		fetch('/api/state/'+window.location.hash.substr(1), {
@@ -90,6 +116,10 @@ fetch('/api/state/'+window.location.hash.substr(1)).then(res => {
 		if(json.categories) store.dispatch({
 			type : 'SET_CATS',
 			categories : json.categories
+		})
+		if(json.clusters) store.dispatch({
+			type : 'SET_CLUSTERS',
+			clusters : json.clusters
 		})
 		if(json.ideas) store.dispatch({
 			type : 'REPLACE_IDEAS',

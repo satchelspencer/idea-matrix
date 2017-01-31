@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, css } from 'aphrodite';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import cluster from './lib/cluster';
 import {Motion, spring} from 'react-motion';
 
 const styles = StyleSheet.create({
@@ -35,12 +34,14 @@ const styles = StyleSheet.create({
 	},
 	catbox : {
 		position : 'absolute',
-		width : 100,
-		height : 100,
+		width : 102,
+		height : 102,
+		marginTop : -1,
 		display : 'flex',
 		alignItems :'center',
 		justifyContent : 'center',
 		borderBottom : '1px solid #e2e2e2',
+		borderTop : '1px solid #e2e2e2',
 		boxSizing : 'border-box',
 		padding : 5,
 		fontSize : 12,
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
 })
 
 const Ruler = connect(state => ({
-	categories : cluster(state),
+	categories : state.categories,
 	offset : state.offset
 }))(({
 	axis,
@@ -67,7 +68,7 @@ const Ruler = connect(state => ({
 			}}
 		>
 			{categories.map((catname, i) => (
-				<Motion key={catname+axis} style={{top: spring(i*100)}}>{value => 
+				<Motion key={catname+axis} style={{top: spring(i*100, {stiffness : 200, damping : 40})}}>{value => 
 					<div 
 						className={css(styles.catbox)}
 						style={value}

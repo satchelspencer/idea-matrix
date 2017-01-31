@@ -6,16 +6,16 @@ import ui from 'redux-ui';
 
 const styles = StyleSheet.create({
 	wrapper : {
-		flex : 1,
 		display : 'flex',
 		flexDirection : 'column'
 	},
-	textarea : {
+	input : {
 		flex : 1,
 		border : 'none',
 		fontSize : 30,
 		borderRadius : 20,
-		padding : 20
+		padding : 20,
+		height : 64
 	},
 	save : {
 		height : 100,
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
 	}
 })
 
-const Editor = ui({state : {
+const AddTopic = ui({state : {
 	value : null
 }})(({
 	ui, updateUI, resetUI,
@@ -41,19 +41,18 @@ const Editor = ui({state : {
 	params
 }) => (
 	<div className={css(styles.wrapper)}>
-		<textarea 
-			className={css(styles.textarea)} 
-			value={ui.value||((ideas[params.cell[0]]||{})[params.cell[1]])||''}
+		<input 
+			className={css(styles.input)} 
+			value={ui.value||''}
 			onChange={e => updateUI({value : e.target.value})}
 		/>
 		<div 
 			className={css(styles.save)}
 			onClick={() => dispatch({
-				type : 'SET_IDEA',
-				cell : params.cell,
-				value : ui.value
+				type : 'ADD_CAT',
+				cat : ui.value
 			}) && dispatch({type : 'CLOSE_POPUP'}) && resetUI()}
-		>save</div>
+		>add topic</div>
 	</div>
 ))
 export default connect(
@@ -61,4 +60,4 @@ export default connect(
 		categories : state.categories,
 		ideas : state.ideas
 	})
-)(Editor);
+)(AddTopic);

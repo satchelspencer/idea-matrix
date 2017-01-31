@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import Draggable from 'react-draggable';
 import Measure from 'react-measure';
 import ui from 'redux-ui';
-import cluster from './lib/cluster';
 import {Motion, spring} from 'react-motion';
 
 const styles = StyleSheet.create({
@@ -26,15 +25,17 @@ const styles = StyleSheet.create({
 	},
 	cell : {
 		position : 'absolute',
-		width : 100,
-		height : 100,
-		borderBottom : '1px solid #d8d8d8',
-		borderRight : '1px solid #d8d8d8',
+		width : 102,
+		height : 102,
+		marginTop : -1,
+		marginLeft : -1,
+		border : '1px solid #d8d8d8',
 		boxSizing : 'border-box',
 		flex : 'none'
 	}
 })
 
+const colors = ['red', 'blue', 'orange', 'green', 'yellow', 'purple']
 
 const Matrix = ui({
 	state : {
@@ -46,6 +47,7 @@ const Matrix = ui({
 	ui, updateUI,
 	dispatch,
 	categories,
+	clusters,
 	ideas
 }) => (
 <Measure shouldMeasure={true} onMeasure={({width,height}) => updateUI({width,height})}>
@@ -78,26 +80,30 @@ const Matrix = ui({
 						return (
 							<Motion key={catname+catnameB} 
 								style={{
-									top: spring(i*100),
-									left : spring(j*100)
+									top: spring(i*100, {stiffness : 200, damping : 40}),
+									left : spring(j*100, {stiffness : 200, damping : 40})
 								}}
 							>{value => 
 								<div
 									className={css(styles.cell)}
 									onClick={() => {
-										// !ui.noclick && dispatch({
-										// 	type : 'EDIT_CELL',
-										// 	cell : [catname, catnameB]
-										// })
 										!ui.noclick && dispatch({
-											type : 'SET_IDEA',
-											cell : [catname, catnameB],
-											value : 'ay'
+											type : 'OPEN_POPUP',
+											params : {
+												editor : true,
+												head : catname+' & '+catnameB,
+												cell : [catname, catnameB]
+											}
 										})
+										// !ui.noclick && dispatch({
+										// 	type : 'SET_IDEA',
+										// 	cell : [catname, catnameB],
+										// 	value : 'ay'
+										// })
 									}}
 									style={{
 										...value,
-										background : val?`rgb(134, 245, 195)`:'white'
+										background : val && ((clusters[catname] == clusters[catnameB] && clusters[catname] !== undefined)? `hsl(${(clusters[catname]*100)%360},82%,70%)`:'#d4d4d4')
 									}}
 								/>
 							}</Motion>							
@@ -112,7 +118,8 @@ const Matrix = ui({
 ))
 export default connect(
 	state => ({
-		categories : cluster(state),
-		ideas : state.ideas
+		categories : state.categories,
+		ideas : state.ideas,
+		clusters : state.clusters
 	})
 )(Matrix);
