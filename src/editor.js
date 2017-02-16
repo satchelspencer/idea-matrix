@@ -39,23 +39,29 @@ const Editor = ui({state : {
 	categories,
 	ideas,
 	params
-}) => (
-	<div className={css(styles.wrapper)}>
-		<textarea 
-			className={css(styles.textarea)} 
-			value={ui.value||((ideas[params.cell[0]]||{})[params.cell[1]])||''}
-			onChange={e => updateUI({value : e.target.value})}
-		/>
-		<div 
-			className={css(styles.save)}
-			onClick={() => dispatch({
-				type : 'SET_IDEA',
-				cell : params.cell,
-				value : ui.value
-			}) && dispatch({type : 'CLOSE_POPUP'}) && resetUI()}
-		>save</div>
-	</div>
-))
+}) => {
+	let cell = _.sortBy(params.cell);
+	return (
+		<div className={css(styles.wrapper)}>
+			<textarea 
+				className={css(styles.textarea)} 
+				value={ui.value||((ideas[cell[0]]||{})[cell[1]])||''}
+				onChange={e => updateUI({value : e.target.value})}
+			/>
+			{window.location.hash && <div 
+				className={css(styles.save)}
+				onClick={() => {
+					if(ui.value) dispatch({
+						type : 'SET_IDEA',
+						cell : cell,
+						value : ui.value
+					})
+					dispatch({type : 'CLOSE_POPUP'}) && resetUI()
+				}}
+			>save</div>}
+		</div>
+	)
+})
 export default connect(
 	state => ({
 		categories : state.categories.present,

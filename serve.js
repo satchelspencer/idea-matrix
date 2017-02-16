@@ -15,6 +15,7 @@ const outputPath = path.resolve(__dirname, 'build');
 
 const config = require('./conf/webpack.config.js');
 const fs = require('fs-extra');
+const _ = require('lodash');
 
 const root = 'data/';
 const def = {
@@ -56,6 +57,22 @@ server.post('/api/state/:id', bodyParser.json(), function(req,res){
 server.get('/api/state/:id', function(req,res){
 	const p = root+req.params.id+'.json';
 	fs.readFile(p, (e, data) => e?res.json(def):res.json(JSON.parse(data)));
+})
+server.get('/api/allState/', function(req,res){
+	fs.readdir(root, (err, files) => {
+		var fileStates = files
+			.filter(f => f.match(/\.json$/))
+			.map(f => JSON.parse(fs.readFileSync(root+f)));
+		var state = _.reduce(fileStates, (sum, state) => {
+			sum.ideas = _.mergeWith(sum.ideas, state.ideas, (a, b) => {
+				if(_.isString(a)) return a+'\n\n'+b;
+			})
+			sum.categories = _.uniq(sum.categories.concat(state.categories));
+			sum.clusters = {}
+			return sum;
+		})
+		res.end(JSON.stringify(state, null, 2));
+	})
 })
 
 if(process.env.NODE_ENV == 'development'){

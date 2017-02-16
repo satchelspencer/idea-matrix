@@ -8,6 +8,7 @@ import Rulers from './rulers';
 import Matrix from './matrix';
 import Popup from './popup';
 import Menu from './menu';
+import Graph from './graph';
 
 const styles = StyleSheet.create({
 	container : {
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
 		display : 'flex',
 		alignItems : 'center',
 		justifyContent : 'center',
-		color : 'white',
+		color : 'red',
 		cursor : 'pointer',
 		fontSize : 50
 	}

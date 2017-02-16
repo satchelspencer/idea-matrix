@@ -1,6 +1,13 @@
 import _ from 'lodash';
-import mc from 'markov-clustering'
 import math from 'mathjs'
+import { jLouvain } from 'jlouvain';
+
+const options = {
+  expandFactor: 1, //more => larger cluster
+  inflateFactor: 1,
+  maxLoops: 10,
+  multFactor: 1
+}
 
 export function oldCluster(ideas, categories){
 	const adj = {};
@@ -31,27 +38,20 @@ export function oldCluster(ideas, categories){
 }
 
 export default function(ideas, categories){
-	const l = categories.length;
-	const arr = _.fill(Array(l), 0).map(a => _.fill(Array(l), 0));
+	const nodes = categories;
+	const edges = [];
 	_.each(ideas, (val, key) => {
 		_.each(val, (v,keyb) => {
 			if(v && _.includes(categories, key) && _.includes(categories, keyb)){
-				arr[categories.indexOf(key)][categories.indexOf(keyb)] = 1;
-				arr[categories.indexOf(keyb)][categories.indexOf(key)] = 1;
+				edges.push({
+					source : key,
+					target : keyb,
+					weight : 1
+				})
 			}
 		})
 	})
-	const cIndicies = mc.cluster(math.matrix(arr));
-	const clusters = {};
-	cIndicies.filter(c => c.length > 1).forEach((group,i) => {
-		group.forEach(j => clusters[categories[j]] = i)
-	})
-	const rows = _.uniq(
-		_.flatten(
-			_.sortBy(cIndicies, c=>c.length*-1).map(
-				group => _.sortBy(group.map(i => categories[i]), cat => cat.toLowerCase())
-			)
-		)
-	)
+	const clusters = jLouvain().nodes(nodes).edges(edges)();
+	const rows = _(clusters).invertBy().values().flatten().value();
 	return {rows, clusters};
 }

@@ -93,15 +93,18 @@ const reducers = {
 	}
 }
 
+let inithash = window.location.hash;
+
 let store = createStore(combineReducers(reducers), {}, compose(
 	window.devToolsExtension ? window.devToolsExtension() : f => f
 ));
 
 let currentIdeas = {};
+let fetched = false;
 store.subscribe(() => {
 	const ideas = _.pick(store.getState(), 'ideas', 'categories', 'clusters');
 	ideas.categories = ideas.categories && ideas.categories.present
-	if(!_.isEqual(ideas, currentIdeas)){
+	if(inithash && !_.isEqual(ideas, currentIdeas) && fetched){
 		currentIdeas = JSON.parse(JSON.stringify(ideas));
 		fetch('/api/state/'+window.location.hash.substr(1), {
 			method: "POST",
@@ -113,11 +116,10 @@ store.subscribe(() => {
 	}
 })
 
-if(!window.location.hash){
-	window.location.hash = '#'+uniqid();
-}
 
-fetch('/api/state/'+window.location.hash.substr(1)).then(res => {
+let fetchUrl = inithash?'/api/state/'+window.location.hash.substr(1):'/api/allState/';
+
+fetch(fetchUrl).then(res => {
 	res.json().then(json => {
 		if(json.categories) store.dispatch({
 			type : 'SET_CATS',
@@ -131,6 +133,7 @@ fetch('/api/state/'+window.location.hash.substr(1)).then(res => {
 			type : 'REPLACE_IDEAS',
 			ideas : json.ideas
 		})
+		fetched = true;
 	})
 })
 

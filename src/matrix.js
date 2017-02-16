@@ -48,6 +48,7 @@ const Matrix = ui({
 	dispatch,
 	categories,
 	clusters,
+	catRange,
 	ideas
 }) => (
 <Measure shouldMeasure={true} onMeasure={({width,height}) => updateUI({width,height})}>
@@ -87,23 +88,24 @@ const Matrix = ui({
 								<div
 									className={css(styles.cell)}
 									onClick={() => {
-										// !ui.noclick && dispatch({
-										// 	type : 'OPEN_POPUP',
-										// 	params : {
-										// 		editor : true,
-										// 		head : catname+' & '+catnameB,
-										// 		cell : [catname, catnameB]
-										// 	}
-										// })
-										!ui.noclick && dispatch({
-											type : 'SET_IDEA',
-											cell : [catname, catnameB],
-											value : 'ay'
+										(!ui.noclick) && dispatch({
+											type : 'OPEN_POPUP',
+											params : {
+												editor : true,
+												head : catname+' & '+catnameB,
+												cell : [catname, catnameB]
+											}
 										})
+										// !ui.noclick && dispatch({
+										// 	type : 'SET_IDEA',
+										// 	cell : [catname, catnameB],
+										// 	value : 'ay'
+										// })
 									}}
 									style={{
 										...value,
-										background : val && ((clusters[catname] == clusters[catnameB] && clusters[catname] !== undefined)? `hsl(${(clusters[catname]*100)%360},82%,70%)`:'#d4d4d4')
+										background : val && ((clusters[catname] == clusters[catnameB] && clusters[catname] !== undefined)? `hsl(${(clusters[catname]*100)%360},82%,50%)`:'black'),
+										opacity :  val && Math.sqrt(((val.split('\n').length)-catRange.min)/(catRange.max-catRange.min))+0.3
 									}}
 								/>
 							}</Motion>							
@@ -117,9 +119,16 @@ const Matrix = ui({
 </Measure>
 ))
 export default connect(
-	state => ({
-		categories : state.categories.present,
-		ideas : state.ideas,
-		clusters : state.clusters
-	})
+	state => {
+		var catWeights = _.flatten(_.values(state.ideas).map(c => _.values(c))).map(v => v.split('\n').length);
+		return {
+			categories : state.categories.present,
+			ideas : state.ideas,
+			clusters : state.clusters,
+			catRange : {
+				min : _.min(catWeights),
+				max : _.max(catWeights)
+			}
+		}
+	}
 )(Matrix);

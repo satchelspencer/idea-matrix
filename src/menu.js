@@ -50,17 +50,17 @@ const Menu = ui({state : {
 		width : menu?150:0,
 		pointerEvents : menu?'all':'none'
 	}}>
-		<Icon name='plus' onClick={() => dispatch({
+		{window.location.hash && <Icon name='plus' onClick={() => dispatch({
 			type : 'OPEN_POPUP',
 			params : {
 				addTopic : true
 			}
-		})}/>
-		<Icon style={{
+		})}/>}
+		{window.location.hash && <Icon style={{
 			background : removing && '#ffb4b4'
 		}} name='trash' onClick={() => dispatch({
 			type : 'TOGGLE_REMOVING'
-		})}/>
+		})}/>}
 		<Icon name='th-large' onClick={() => {
 			const {rows, clusters} = cluster(ideas, categories);
 			dispatch({
