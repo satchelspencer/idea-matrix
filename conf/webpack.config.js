@@ -40,7 +40,8 @@ module.exports = {
 	resolve : {
 		extensions: ['', '.js', '.jsx', '.json'],
 		alias: {
-        'data': path.join(__dirname, '../data', 'dist')
+        'data': path.join(__dirname, '../data', 'dist'),
+        'react' : 'react/react'
     }
 	},
   	plugins: [

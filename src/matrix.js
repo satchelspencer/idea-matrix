@@ -49,6 +49,7 @@ const Matrix = ui({
 	categories,
 	clusters,
 	catRange,
+	offset,
 	ideas
 }) => (
 <Measure shouldMeasure={true} onMeasure={({width,height}) => updateUI({width,height})}>
@@ -76,6 +77,7 @@ const Matrix = ui({
 				{categories.map((catname, i) => (
 					<div key={catname+'m'}>
 					{categories.map((catnameB, j) => {
+						var [xoff, yoff] = offset.map(i=>i*-1);
 						const ids = _.sortBy([catname,catnameB]);
 						const val = (ideas[ids[0]]||{})[ids[1]]
 						return (
@@ -84,30 +86,35 @@ const Matrix = ui({
 									top: spring(i*100, {stiffness : 200, damping : 40}),
 									left : spring(j*100, {stiffness : 200, damping : 40})
 								}}
-							>{value => 
-								<div
-									className={css(styles.cell)}
-									onClick={() => {
-										(!ui.noclick) && dispatch({
-											type : 'OPEN_POPUP',
-											params : {
-												editor : true,
-												head : catname+' & '+catnameB,
-												cell : [catname, catnameB]
-											}
-										})
-										// !ui.noclick && dispatch({
-										// 	type : 'SET_IDEA',
-										// 	cell : [catname, catnameB],
-										// 	value : 'ay'
-										// })
-									}}
-									style={{
-										...value,
-										background : val && ((clusters[catname] == clusters[catnameB] && clusters[catname] !== undefined)? `hsl(${(clusters[catname]*100)%360},82%,50%)`:'black'),
-										opacity :  val && Math.sqrt(((val.split('\n').length)-catRange.min)/(catRange.max-catRange.min))+0.3
-									}}
-								/>
+							>{value => {
+								var [cxoff, cyoff] = [value.left,value.top];
+								return (cxoff+100 >= xoff && cyoff+100 >= yoff && cxoff <= xoff+ui.width-100 && cyoff <= yoff+ui.height-100) && (
+									<div
+										key={catname+catnameB+'c'} 
+										className={css(styles.cell)}
+										onClick={() => {
+											(!ui.noclick) && dispatch({
+												type : 'OPEN_POPUP',
+												params : {
+													editor : true,
+													head : catname+' & '+catnameB,
+													cell : [catname, catnameB]
+												}
+											})
+											// !ui.noclick && dispatch({
+											// 	type : 'SET_IDEA',
+											// 	cell : [catname, catnameB],
+											// 	value : 'ay'
+											// })
+										}}
+										style={{
+											...value,
+											background : val && ((clusters[catname] == clusters[catnameB] && clusters[catname] !== undefined)? `hsl(${(clusters[catname]*100)%360},82%,50%)`:'black'),
+											opacity :  val && Math.sqrt(((val.split('\n').length)-catRange.min)/(catRange.max-catRange.min))+0.3
+										}}
+									/>
+								)
+							}								
 							}</Motion>							
 						)
 					})}
@@ -125,6 +132,7 @@ export default connect(
 			categories : state.categories.present,
 			ideas : state.ideas,
 			clusters : state.clusters,
+			offset : state.offset.map(o=>Math.min(0, o)),
 			catRange : {
 				min : _.min(catWeights),
 				max : _.max(catWeights)

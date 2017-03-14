@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
 
 const Ruler = connect(state => ({
 	categories : state.categories.present,
+	clusters : state.clusters,
 	offset : state.offset,
 	removing : state.removing
 }))(({
@@ -69,6 +70,7 @@ const Ruler = connect(state => ({
 	offset,
 	removing,
 	categories,
+	clusters,
 	dispatch
 }) =>(
 	<div className={css(styles.ruler, axis=='x'?styles.rulerX:styles.rulerY)}>
@@ -85,7 +87,7 @@ const Ruler = connect(state => ({
 						className={css(styles.catbox)}
 						style={{
 							...value,
-							background : removing && '#bc0000',
+							background : removing?'#bc0000':`hsl(${(clusters[catname]*100)%360},54%,82%)`,
 							color : removing && 'white'
 						}}
 					>
