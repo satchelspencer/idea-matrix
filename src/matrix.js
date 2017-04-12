@@ -110,7 +110,7 @@ const Matrix = ui({
 										style={{
 											...value,
 											background : val && ((clusters[catname] == clusters[catnameB] && clusters[catname] !== undefined)? `hsl(${(clusters[catname]*100)%360},82%,50%)`:'black'),
-											opacity :  val && Math.sqrt(((val.split('\n').length)-catRange.min)/(catRange.max-catRange.min))+0.3
+											opacity : val && (Math.sqrt(((val.length)-catRange.min)/(catRange.max-catRange.min+0.0001))+0.3)
 										}}
 									/>
 								)
@@ -127,7 +127,7 @@ const Matrix = ui({
 ))
 export default connect(
 	state => {
-		var catWeights = _.flatten(_.values(state.ideas).map(c => _.values(c))).map(v => v.split('\n').length);
+		var catWeights = _.flatten(_.values(state.ideas).map(c => _.values(c))).map(v => v.length);
 		return {
 			categories : state.categories.present,
 			ideas : state.ideas,

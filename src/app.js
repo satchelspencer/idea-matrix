@@ -65,6 +65,10 @@ export default connect(
 	state => ({menu : state.menu})
 )(App);
 
+window.onhashchange = function(){
+	window.location.reload()
+}
+
 document.ontouchmove = function(event){
     event.preventDefault();
 }

@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
 		height : '100%',
 		overflow : 'hidden',
 		fontFamily : 'sans-serif',
-		background : 'hsla(0, 0%, 73%, 0.87)',
+		background : 'hsla(0, 0%, 100%, 0.93)',
 		transition : '0.3s all',
 		display : 'flex',
 		flexDirection : 'column',
@@ -28,30 +28,33 @@ const styles = StyleSheet.create({
 		alignItems : 'center',
 		fontSize : 25,
 		background : 'white',
-		paddingLeft : 50
+		paddingLeft : 50,
+		borderBottom : '1px solid #d6d6d6'
 	},
 	close : {
 		cursor : 'pointer',
 		height : 100,
-		fontSize : 50,
+		fontSize : 35,
 		lineHeight : '90px',
 		textAlign : 'center',
-		width : 100,
 		':hover' : {
 			color : 'grey'
-		}
+		},
+		marginRight : 40
 	},
 	body : {
 		flex : 1,
 		padding : 30,
 		display : 'flex',
 		flexDirection : 'column',
-		justifyContent : 'center'
+		justifyContent : 'center',
+		overflow : 'scroll'
 	}
 })
 
 const Popup = ui({state : {
-	value : null
+	value : null,
+	editorState : null
 }})(({
 	ui, updateUI, resetUI,
 	dispatch,
@@ -67,11 +70,19 @@ const Popup = ui({state : {
 			<div>{state.params.head}</div>
 			<div 
 				className={css(styles.close)}
-				onClick={() => dispatch({type : 'CLOSE_POPUP'}) && resetUI()}
-			>&times;</div>
+				onClick={() => {
+					if(ui.editorState) dispatch({
+						type : 'SET_IDEA',
+						cell : ui.editorState.cell,
+						value : ui.editorState.ideas
+					});
+					dispatch({type : 'CLOSE_POPUP'});
+					resetUI();
+				}}
+			>{window.location.hash?'save':'close'}</div>
 		</div>
 		<div className={css(styles.body)}>
-			{state.params.editor && <Editor params={state.params}/>}
+			{state.params.editor && <Editor params={state.params} onUpdate={state => updateUI({editorState : state})}/>}
 			{state.params.addTopic && <AddTopic/>}
 		</div>
 	</div>

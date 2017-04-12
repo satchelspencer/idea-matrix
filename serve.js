@@ -65,7 +65,7 @@ server.get('/api/allState/', function(req,res){
 			.map(f => JSON.parse(fs.readFileSync(root+f)));
 		var state = _.reduce(fileStates, (sum, state) => {
 			sum.ideas = _.mergeWith(sum.ideas, state.ideas, (a, b) => {
-				if(_.isString(a)) return a+'\n\n'+b;
+				if(_.isArray(a)) return a.concat(b); ///difffffff
 			})
 			sum.categories = _.uniq(sum.categories.concat(state.categories));
 			sum.clusters = {}

@@ -31,10 +31,12 @@ const reducers = {
 				return action.ideas;
 			case 'SET_IDEA':
 				const indices = _.sortBy(action.cell)
-				return _.merge({...state}, {
+				return _.mergeWith(state, {
 					[indices[0]] : {
 						[indices[1]] : action.value
 					}
+				}, (a, b) => {
+					if(_.isArray(a)) return b;
 				});
 			default:
 				return state;
@@ -63,7 +65,7 @@ const reducers = {
 					params : action.params||{}
 				}
 			case 'CLOSE_POPUP':
-				return {...state, open : false}
+				return {...state, open : false, params : {}}
 			default:
 				return state
 		}
